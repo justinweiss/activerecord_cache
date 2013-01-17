@@ -76,6 +76,12 @@ module ActiveRecordCache
         raise ActiveRecordCache::CacheNotEnabled, message
       end
 
+      # As of Rails 3.2, associations are singleton objects, which
+      # can't be marshalled. We have to clear the associations here in
+      # order to be able to cache the object, which unfortunately
+      # means the associated objects aren't automatically cached.
+      self.clear_association_cache
+
       Rails.cache.write(self.class.cache_key(self), self)
     end
 
